@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/resource.h>
+#include <stdbool.h>
 
 #define BLOCK_SIZE sizeof(Block)
 #define PAGE_SIZE sysconf(_SC_PAGESIZE)
@@ -16,7 +17,10 @@ typedef uintptr_t word_t;
 
 typedef struct Block {
     size_t size;
+    bool allocated;
 } Block;
+
+
 
 void* reserve(size_t size);
 void release(void* ptr);
