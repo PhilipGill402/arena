@@ -7,7 +7,7 @@ SRC = $(wildcard src/*.c)
 OBJ = $(patsubst src/%.c,src/%.o,$(SRC))
 
 # Output binary
-TARGET = allocate 
+TARGET = arena 
 
 # Default rule
 all: $(TARGET)

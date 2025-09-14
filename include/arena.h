@@ -15,12 +15,18 @@
 
 typedef uintptr_t word_t;
 
-typedef struct Block {
+typedef struct block_t {
     size_t size;
     bool allocated;
-} Block;
+    //pads block to be 16 bytes
+    uint8_t _pad[7];
+} block_t;
 
+typedef struct arena_t {
+    uint8_t* ptr;
+    size_t size;
+    uint8_t* end;
+} arena_t;
 
-
-void* reserve(size_t size);
-void release(void* ptr);
+arena_t* create_arena(size_t size);
+void release_arena(arena_t* arena);
