@@ -97,17 +97,15 @@ void* reserve(arena_t* arena, size_t size){
     return NULL;
 }
 
+void release(void* ptr){
+    block_t* block = (block_t*)((uint8_t*)ptr - sizeof(block_t));
+    block->allocated = false;
+}
+
 int main(){
     arena_t* arena = create_arena(PAGE_SIZE);
     int* num = reserve(arena, sizeof(int));
-    int* num_array = reserve(arena, sizeof(int) * 10);
-    for (int i = 0; i < 10; i++){
-        num_array[i] = i;
-    }
-
-    for (int i = 0; i < 10; i++){
-        printf("%d\n", num_array[i]);
-    }
+    *num = 10;
     release_arena(arena); 
     
     return 0;

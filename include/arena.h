@@ -30,3 +30,5 @@ typedef struct arena_t {
 
 arena_t* create_arena(size_t size);
 void release_arena(arena_t* arena);
+void* reserve(arena_t* arena, size_t size);
+void release(void* ptr);
