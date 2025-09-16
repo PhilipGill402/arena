@@ -41,7 +41,7 @@ arena_t* create_arena(size_t size){
 
     block_t* block = (block_t*)arena->ptr;
     block->size = arena->size;
-    block->allocated = 0;
+    block->allocated = false;
     return arena;
 }
 
@@ -64,20 +64,50 @@ void release_arena(arena_t* arena){
 void* reserve(arena_t* arena, size_t size){
     //align to 8 byte increments
     size = align(size, 8);
-
+    size_t total_size = sizeof(block_t) + size;
+    
     //finds the first fit block 
-
     block_t* block = (block_t*)arena->ptr;
+    
 
-    return block;
+    while ((uint8_t*)block != (uint8_t*)arena->end){
+        if (!block->allocated && block->size >= total_size){
+            size_t unneeded = block->size - total_size;
+            if (unneeded >= sizeof(block_t)){
+                block->size = total_size;
+                block->allocated = true;
+
+                block_t* new_block = (block_t*)((uint8_t*)block + block->size);
+                new_block->size = unneeded;
+                new_block->allocated = false;
+            } else {
+                block->allocated = true;
+            }
+
+            return (void*)((uint8_t*)block + sizeof(block_t));
+        } else if ((uint8_t*)get_next_block(block, arena) > (uint8_t*)arena->end){
+            //we reached the end of the arena 
+            break;
+        } else {
+            //move on to the next block;
+            block = get_next_block(block, arena);
+        }
+    } 
+
+    return NULL;
 }
 
 int main(){
-    size_t size = sizeof(int);
-    arena_t* arena = create_arena(size);
-    block_t* block = (block_t*)reserve(arena, size);
-    
-    printf("%ld\n", block->size);
+    arena_t* arena = create_arena(PAGE_SIZE);
+    int* num = reserve(arena, sizeof(int));
+    int* num_array = reserve(arena, sizeof(int) * 10);
+    for (int i = 0; i < 10; i++){
+        num_array[i] = i;
+    }
+
+    for (int i = 0; i < 10; i++){
+        printf("%d\n", num_array[i]);
+    }
     release_arena(arena); 
     
     return 0;
